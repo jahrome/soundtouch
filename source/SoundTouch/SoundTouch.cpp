@@ -69,11 +69,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <assert.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
-#include <stdexcept>
 #include <stdio.h>
 
 #include "SoundTouch.h"
@@ -144,10 +142,6 @@ uint SoundTouch::getVersionId()
 // Sets the number of channels, 1 = mono, 2 = stereo
 void SoundTouch::setChannels(uint numChannels)
 {
-    if (numChannels != 1 && numChannels != 2) 
-    {
-        throw std::runtime_error("Illegal number of channels");
-    }
     channels = numChannels;
     pRateTransposer->setChannels((int)numChannels);
     pTDStretch->setChannels((int)numChannels);
@@ -244,13 +238,12 @@ void SoundTouch::calcEffectiveRateAndTempo()
     if (!TEST_FLOAT_EQUAL(tempo, oldTempo)) pTDStretch->setTempo(tempo);
 
 #ifndef PREVENT_CLICK_AT_RATE_CROSSOVER
-    if (rate <= 1.0f) 
+    if (rate <= 1.0f)
     {
         if (output != pTDStretch) 
         {
             FIFOSamplePipe *tempoOut;
 
-            assert(output == pRateTransposer);
             // move samples in the current output buffer to the output of pTDStretch
             tempoOut = pTDStretch->getOutput();
             tempoOut->moveSamples(*output);
@@ -267,7 +260,6 @@ void SoundTouch::calcEffectiveRateAndTempo()
         {
             FIFOSamplePipe *transOut;
 
-            assert(output == pTDStretch);
             // move samples in the current output buffer to the output of pRateTransposer
             transOut = pRateTransposer->getOutput();
             transOut->moveSamples(*output);
@@ -293,21 +285,11 @@ void SoundTouch::setSampleRate(uint srate)
 // the input of the object.
 void SoundTouch::putSamples(const SAMPLETYPE *samples, uint nSamples)
 {
-    if (bSrateSet == FALSE) 
-    {
-        throw std::runtime_error("SoundTouch : Sample rate not defined");
-    } 
-    else if (channels == 0) 
-    {
-        throw std::runtime_error("SoundTouch : Number of channels not defined");
-    }
-
     // Transpose the rate of the new samples if necessary
     /* Bypass the nominal setting - can introduce a click in sound when tempo/pitch control crosses the nominal value...
     if (rate == 1.0f) 
     {
         // The rate value is same as the original, simply evaluate the tempo changer. 
-        assert(output == pTDStretch);
         if (pRateTransposer->isEmpty() == 0) 
         {
             // yet flush the last samples in the pitch transposer buffer
@@ -318,10 +300,9 @@ void SoundTouch::putSamples(const SAMPLETYPE *samples, uint nSamples)
     } 
     */
 #ifndef PREVENT_CLICK_AT_RATE_CROSSOVER
-    else if (rate <= 1.0f) 
+    if (rate <= 1.0f)
     {
         // transpose the rate down, output the transposed sound to tempo changer buffer
-        assert(output == pTDStretch);
         pRateTransposer->putSamples(samples, nSamples);
         pTDStretch->moveSamples(*pRateTransposer);
     } 
@@ -329,7 +310,6 @@ void SoundTouch::putSamples(const SAMPLETYPE *samples, uint nSamples)
 #endif
     {
         // evaluate the tempo changer, then transpose the rate up, 
-        assert(output == pRateTransposer);
         pTDStretch->putSamples(samples, nSamples);
         pRateTransposer->moveSamples(*pTDStretch);
     }

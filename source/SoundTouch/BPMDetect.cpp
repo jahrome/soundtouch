@@ -55,7 +55,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <math.h>
-#include <assert.h>
 #include <string.h>
 #include "FIFOSampleBuffer.h"
 #include "PeakFinder.h"
@@ -98,14 +97,11 @@ BPMDetect::BPMDetect(int numChannels, int aSampleRate)
 
     // choose decimation factor so that result is approx. 500 Hz
     decimateBy = sampleRate / 500;
-    assert(decimateBy > 0);
-    assert(INPUT_BLOCK_SAMPLES < decimateBy * DECIMATED_BLOCK_SAMPLES);
 
     // Calculate window length & starting item according to desired min & max bpms
     windowLen = (60 * sampleRate) / (decimateBy * MIN_BPM);
     windowStart = (60 * sampleRate) / (decimateBy * MAX_BPM);
 
-    assert(windowLen > windowStart);
 
     // allocate new working objects
     xcorr = new float[windowLen];
@@ -144,8 +140,6 @@ int BPMDetect::decimate(SAMPLETYPE *dest, const SAMPLETYPE *src, int numsamples)
     int count, outcount;
     LONG_SAMPLETYPE out;
 
-    assert(channels > 0);
-    assert(decimateBy > 0);
     outcount = 0;
     for (count = 0; count < numsamples; count ++) 
     {
@@ -191,7 +185,6 @@ void BPMDetect::updateXCorr(int process_samples)
     int offs;
     SAMPLETYPE *pBuffer;
     
-    assert(buffer->numSamples() >= (uint)(process_samples + windowLen));
 
     pBuffer = buffer->ptrBegin();
     for (offs = windowStart; offs < windowLen; offs ++) 
@@ -300,7 +293,6 @@ float BPMDetect::getBpm()
     // find peak position
     peakPos = peakFinder.detectPeak(xcorr, windowStart, windowLen);
 
-    assert(decimateBy != 0);
     if (peakPos < 1e-6) return 0.0; // detection failed.
 
     // calculate BPM

@@ -40,10 +40,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <memory.h>
-#include <assert.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdexcept>
 #include "FIRFilter.h"
 #include "cpu_detect.h"
 
@@ -81,10 +79,6 @@ uint FIRFilter::evaluateFilterStereo(SAMPLETYPE *dest, const SAMPLETYPE *src, ui
     double dScaler = 1.0 / (double)resultDivider;
 #endif
 
-    assert(length != 0);
-    assert(src != NULL);
-    assert(dest != NULL);
-    assert(filterCoeffs != NULL);
 
     end = 2 * (numSamples - length);
 
@@ -140,7 +134,6 @@ uint FIRFilter::evaluateFilterMono(SAMPLETYPE *dest, const SAMPLETYPE *src, uint
 #endif
 
 
-    assert(length != 0);
 
     end = numSamples - length;
     for (j = 0; j < end; j ++) 
@@ -173,12 +166,9 @@ uint FIRFilter::evaluateFilterMono(SAMPLETYPE *dest, const SAMPLETYPE *src, uint
 // Throws an exception if filter length isn't divisible by 8
 void FIRFilter::setCoefficients(const SAMPLETYPE *coeffs, uint newLength, uint uResultDivFactor)
 {
-    assert(newLength > 0);
-    if (newLength % 8) throw std::runtime_error("FIR filter length not divisible by 8");
 
     lengthDiv8 = newLength / 8;
     length = lengthDiv8 * 8;
-    assert(length == newLength);
 
     resultDivFactor = uResultDivFactor;
     resultDivider = (SAMPLETYPE)::pow(2.0, (int)resultDivFactor);
@@ -202,10 +192,7 @@ uint FIRFilter::getLength() const
 // smaller than the amount of input samples.
 uint FIRFilter::evaluate(SAMPLETYPE *dest, const SAMPLETYPE *src, uint numSamples, uint numChannels) const
 {
-    assert(numChannels == 1 || numChannels == 2);
 
-    assert(length > 0);
-    assert(lengthDiv8 * 8 == length);
     if (numSamples < length) return 0;
     if (numChannels == 2) 
     {
@@ -222,7 +209,6 @@ uint FIRFilter::evaluate(SAMPLETYPE *dest, const SAMPLETYPE *src, uint numSample
 void * FIRFilter::operator new(size_t s)
 {
     // Notice! don't use "new FIRFilter" directly, use "newInstance" to create a new instance instead!
-    throw std::runtime_error("Error in FIRFilter::new: Don't use 'new FIRFilter', use 'newInstance' member instead!");
     return NULL;
 }
 

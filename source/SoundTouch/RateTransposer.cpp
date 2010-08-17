@@ -39,10 +39,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <memory.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdexcept>
 #include "RateTransposer.h"
 #include "AAFilter.h"
 
@@ -108,7 +106,6 @@ public:
 // depending on if we've a MMX/SSE/etc-capable CPU available or not.
 void * RateTransposer::operator new(size_t s)
 {
-    throw runtime_error("Error in RateTransoser::new: don't use \"new TDStretch\" directly, use \"newInstance\" to create a new instance instead!");
     return NULL;
 }
 
@@ -256,7 +253,6 @@ void RateTransposer::downsample(const SAMPLETYPE *src, uint nSamples)
     // Anti-alias filter the samples to prevent folding and output the filtered 
     // data to tempBuffer. Note : because of the FIR filter length, the
     // filtering routine takes in 'filter_length' more samples than it outputs.
-    assert(tempBuffer.isEmpty());
     sizeTemp = storeBuffer.numSamples();
 
     count = pAAFilter->evaluate(tempBuffer.ptrEnd(sizeTemp), 
@@ -284,7 +280,6 @@ void RateTransposer::processSamples(const SAMPLETYPE *src, uint nSamples)
     uint sizeReq;
 
     if (nSamples == 0) return;
-    assert(pAAFilter);
 
     // If anti-alias filter is turned off, simply transpose without applying
     // the filter
@@ -326,10 +321,8 @@ inline uint RateTransposer::transpose(SAMPLETYPE *dest, const SAMPLETYPE *src, u
 // Sets the number of channels, 1 = mono, 2 = stereo
 void RateTransposer::setChannels(int nChannels)
 {
-    assert(nChannels > 0);
     if (numChannels == nChannels) return;
 
-    assert(nChannels == 1 || nChannels == 2);
     numChannels = nChannels;
 
     storeBuffer.setChannels(numChannels);

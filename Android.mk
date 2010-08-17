@@ -35,12 +35,7 @@ LOCAL_SRC_FILES := \
 	source/SoundTouch/RateTransposer.cpp \
 	source/SoundTouch/SoundTouch.cpp \
 	source/SoundTouch/TDStretch.cpp \
-	source/SoundTouch/cpu_detect_x86_gcc.cpp \
-
-#	source/SoundTouch/cpu_detect_x86_win.cpp 
-#	source/SoundTouch/3dnow_win.cpp \
-#	source/SoundTouch/mmx_optimized.cpp \
-#	source/SoundTouch/sse_optimized.cpp \
+	source/SoundTouch/cpu_detect_x86_gcc.cpp
 
 LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/source/SoundTouch \
@@ -50,8 +45,8 @@ LOCAL_C_INCLUDES := \
 LOCAL_CFLAGS += -O0 -lstdc++
 
 LOCAL_MODULE := libsoundtouch
-LOCAL_PRELINK_MODULE := false
 
+LOCAL_PRELINK_MODULE := false
 include $(BUILD_SHARED_LIBRARY)
 
 endif # HOST_OS == linux

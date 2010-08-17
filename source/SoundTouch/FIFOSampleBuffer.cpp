@@ -46,8 +46,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
-#include <assert.h>
-#include <stdexcept>
 
 #include "FIFOSampleBuffer.h"
 
@@ -56,7 +54,6 @@ using namespace soundtouch;
 // Constructor
 FIFOSampleBuffer::FIFOSampleBuffer(int numChannels)
 {
-    assert(numChannels > 0);
     sizeInBytes = 0; // reasonable initial value
     buffer = NULL;
     bufferUnaligned = NULL;
@@ -81,7 +78,6 @@ void FIFOSampleBuffer::setChannels(int numChannels)
 {
     uint usedBytes;
 
-    assert(numChannels > 0);
     usedBytes = channels * samplesInBuffer;
     channels = (uint)numChannels;
     samplesInBuffer = usedBytes / channels;
@@ -154,7 +150,6 @@ SAMPLETYPE *FIFOSampleBuffer::ptrEnd(uint slackCapacity)
 // 'receiveSamples(numSamples)' function
 SAMPLETYPE *FIFOSampleBuffer::ptrBegin()
 {
-    assert(buffer);
     return buffer + bufferPos * channels;
 }
 
@@ -171,12 +166,7 @@ void FIFOSampleBuffer::ensureCapacity(uint capacityRequirement)
     {
         // enlarge the buffer in 4kbyte steps (round up to next 4k boundary)
         sizeInBytes = (capacityRequirement * channels * sizeof(SAMPLETYPE) + 4095) & (uint)-4096;
-        assert(sizeInBytes % 2 == 0);
         tempUnaligned = new SAMPLETYPE[sizeInBytes / sizeof(SAMPLETYPE) + 16 / sizeof(SAMPLETYPE)];
-        if (tempUnaligned == NULL)
-        {
-            throw std::runtime_error("Couldn't allocate memory!\n");
-        }
         // Align the buffer to begin at 16byte cache line boundary for optimal performance
         temp = (SAMPLETYPE *)(((ulong)tempUnaligned + 15) & (ulong)-16);
         if (samplesInBuffer)

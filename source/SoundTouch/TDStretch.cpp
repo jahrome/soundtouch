@@ -43,10 +43,8 @@
 
 #include <string.h>
 #include <limits.h>
-#include <assert.h>
 #include <math.h>
 #include <float.h>
-#include <stdexcept>
 
 #include "STTypes.h"
 #include "cpu_detect.h"
@@ -583,9 +581,7 @@ void TDStretch::setTempo(float newTempo)
 // Sets the number of channels, 1 = mono, 2 = stereo
 void TDStretch::setChannels(int numChannels)
 {
-    assert(numChannels > 0);
     if (channels == numChannels) return;
-    assert(numChannels == 1 || numChannels == 2);
 
     channels = numChannels;
     inputBuffer.setChannels(channels);
@@ -684,7 +680,6 @@ void TDStretch::processSamples()
         // Copies the end of the current sequence from 'inputBuffer' to 
         // 'midBuffer' for being mixed with the beginning of the next 
         // processing sequence and so on
-        assert((offset + temp + overlapLength * 2) <= (int)inputBuffer.numSamples());
         memcpy(pMidBuffer, inputBuffer.ptrBegin() + channels * (offset + temp + overlapLength), 
             channels * sizeof(SAMPLETYPE) * overlapLength);
 
@@ -716,7 +711,6 @@ void TDStretch::acceptNewOverlapLength(int newOverlapLength)
 {
     int prevOvl;
 
-    assert(newOverlapLength >= 0);
     prevOvl = overlapLength;
     overlapLength = newOverlapLength;
 
@@ -740,7 +734,6 @@ void TDStretch::acceptNewOverlapLength(int newOverlapLength)
 void * TDStretch::operator new(size_t s)
 {
     // Notice! don't use "new TDStretch" directly, use "newInstance" to create a new instance instead!
-    throw std::runtime_error("Error in TDStretch::new: Don't use 'new TDStretch' directly, use 'newInstance' member instead!");
     return NULL;
 }
 
@@ -865,7 +858,6 @@ void TDStretch::calculateOverlapLength(int aoverlapMs)
 {
     int newOvl;
 
-    assert(aoverlapMs >= 0);
 
     // calculate overlap length so that it's power of 2 - thus it's easy to do
     // integer division by right-shifting. Term "-1" at end is to account for 
@@ -993,7 +985,6 @@ void TDStretch::calculateOverlapLength(int overlapInMsec)
 {
     int newOvl;
 
-    assert(overlapInMsec >= 0);
     newOvl = (sampleRate * overlapInMsec) / 1000;
     if (newOvl < 16) newOvl = 16;
 

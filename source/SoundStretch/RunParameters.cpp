@@ -36,7 +36,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <stdexcept>
 #include <string>
 #include <stdlib.h>
 
@@ -120,7 +119,6 @@ RunParameters::RunParameters(const int nParams, const char * const paramStr[])
         }
         string msg = whatText;
         msg += usage;
-        throw runtime_error(msg.c_str());
     }
 
     inFileName = NULL;
@@ -200,14 +198,12 @@ void RunParameters::throwIllegalParamExp(const string &str) const
     msg += str;
     msg += "\".\n\n";
     msg += usage;
-    throw runtime_error(msg.c_str());
 }
 
 
 
 void RunParameters::throwLicense() const
 {
-    throw runtime_error(licenseText);
 }
 
 
@@ -264,15 +260,7 @@ void RunParameters::parseSwitchParam(const string &str)
         case 'b' :
             // switch '-bpm=xx'
             detectBPM = TRUE;
-            try
-            {
                 goalBPM = parseSwitchValue(str);
-            } 
-            catch (const runtime_error)
-            {
-                // illegal or missing bpm value => just calculate bpm
-                goalBPM = 0;
-            }
             break;
 
         case 'q' :
